@@ -1,3 +1,5 @@
+// This project will be called `notely`, a full-stack note-taking app.
+
 import React from 'react';
 
 export default function Home() {
