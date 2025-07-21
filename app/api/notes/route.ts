@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server'
 
-let notes = [
+const notes = [
     { id: 1, content: 'Sample note 1' },
     { id: 2, content: 'Sample note 2' },
   ];
