@@ -46,8 +46,9 @@ export default function HomePage() {
       });
 
       if (res.ok) {
-        setNewNote('');       // Clear the input
-        fetchNotes();         // Reload notes from server
+        const addedNote = await res.json();
+        setNotes((prev) => [...prev, addedNote]); // ✅ adds the new note directly
+        setNewNote('');
       } else {
         console.error('Failed to add note');
       }
