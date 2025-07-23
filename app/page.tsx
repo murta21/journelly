@@ -59,7 +59,7 @@ export default function HomePage() {
 
   return (
     <main style={{ padding: '2rem' }}>
-      <h1>Notely</h1>
+      <h1>Notely by Murtaza</h1>
 
       {/* Form to add a new note */}
       <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
