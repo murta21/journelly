@@ -1,26 +1,37 @@
-import { NextResponse, NextRequest } from 'next/server'
+import { supabase } from '@/lib/supabase';
+import { NextRequest, NextResponse } from 'next/server';
 
-const notes = [
-    { id: 1, content: 'Sample note 1' },
-    { id: 2, content: 'Sample note 2' },
-  ];
-
+// GET /api/notes → fetch all notes
 export async function GET() {
+  const { data: notes, error } = await supabase
+    .from('notes')
+    .select('*')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
   return NextResponse.json(notes);
 }
 
+// POST /api/notes → create a new note
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  const { content } = await req.json();
 
-  if (!body.content || typeof body.content !== 'string') {
-    return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+  if (!content || typeof content !== 'string') {
+    return NextResponse.json({ error: 'Invalid note content' }, { status: 400 });
   }
 
-  const newNote = {
-    id: Date.now(), // use current timestamp as id
-    content: body.content,
-  };
+  const { data, error } = await supabase
+    .from('notes')
+    .insert([{ content }])
+    .select()
+    .single();
 
-  notes.push(newNote);
-  return NextResponse.json(newNote); // return the added note
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json(data);
 }
