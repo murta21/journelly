@@ -5,31 +5,28 @@ import { useEffect, useState } from 'react';
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
+  // Load saved theme on first mount
   useEffect(() => {
-    const stored = localStorage.getItem('theme');
-    const isDarkPreferred = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const fallback = isDarkPreferred ? 'dark' : 'light';
-
-    // only accept valid values
-    const initial = stored === 'dark' || stored === 'light' ? stored : fallback;
-
-    setTheme(initial);
-    document.documentElement.classList.toggle('dark', initial === 'dark');
+    const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (saved) {
+      setTheme(saved);
+      document.documentElement.classList.toggle('dark', saved === 'dark');
+    }
   }, []);
 
-  const toggleTheme = () => {
-    const next: 'light' | 'dark' = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
-    localStorage.setItem('theme', next);
-    document.documentElement.classList.toggle('dark', next === 'dark');
-  };
+  // Apply theme class + save to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    console.log('Theme is:', theme);
+  }, [theme]);
 
   return (
     <button
-      onClick={toggleTheme}
-      className="px-3 py-2 border rounded text-sm bg-gray-200 dark:bg-gray-800 dark:text-white"
+      onClick={() => setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))}
+      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded"
     >
-      Toggle {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+      Toggle to {theme === 'light' ? 'Dark' : 'Light'} Mode
     </button>
   );
 }
