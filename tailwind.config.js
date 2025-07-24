@@ -1,8 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class', // 👈 Enables dark mode via class (not media query)
   content: [
-    './app/**/*.{js,ts,jsx,tsx}',       // 👈 for Next.js App Router
-    './components/**/*.{js,ts,jsx,tsx}' // (optional if you make component files)
+    './app/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}'
   ],
   theme: {
     extend: {},

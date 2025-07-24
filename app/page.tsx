@@ -1,54 +1,53 @@
-// `notely`, a full-stack note-taking app.
-
-'use client'; // Important: enables useEffect and useState in App Router
+'use client';
 
 import { useEffect, useState, FormEvent } from 'react';
 
-// Define the structure of a note (for TypeScript)
+// Define the shape of a Note object
 type Note = {
   id: number;
   content: string;
 };
 
-export default function HomePage() {
-  // State to hold the list of notes
+export default function Page() {
+  // State to hold the list of existing notes
   const [notes, setNotes] = useState<Note[]>([]);
-  const [newNote, setNewNote] = useState(''); // input box state
+  // State to track what's typed into the input box
+  const [newNote, setNewNote] = useState('');
 
+  // Fetch notes only once when the component is first rendered
   useEffect(() => {
     fetchNotes();
-  }, []); // [] = only run this once when the page loads
+  }, []);
 
-  // Fetch notes from the backend when the component loads
+  // Fetch notes from the backend API route
   async function fetchNotes() {
-      try {
-        const res = await fetch('/api/notes');
-        const data = await res.json();
-        setNotes(data);
-      } catch (error) {
-        console.error('Failed to fetch notes:', error);
-      }
+    try {
+      const res = await fetch('/api/notes'); // Send GET request
+      const data = await res.json();         // Parse JSON response
+      setNotes(data);                        // Update state with notes
+    } catch (error) {
+      console.error('Failed to fetch notes:', error);
+    }
   }
-  
 
-// Handle form submit
+  // Called when the "Add Note" form is submitted
   async function handleSubmit(e: FormEvent) {
-    e.preventDefault(); // stop page refresh
-    if (!newNote.trim()) return;
+    e.preventDefault(); // Prevent page from refreshing
+
+    if (!newNote.trim()) return; // Ignore empty notes
 
     try {
       const res = await fetch('/api/notes', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: newNote }),
       });
 
       if (res.ok) {
         const addedNote = await res.json();
-        setNotes((prev) => [...prev, addedNote]); // ✅ adds the new note directly
-        setNewNote('');
+        // Add the new note to the list without needing to re-fetch
+        setNotes((prev) => [...prev, addedNote]);
+        setNewNote(''); // Clear the input box
       } else {
         console.error('Failed to add note');
       }
@@ -58,27 +57,36 @@ export default function HomePage() {
   }
 
   return (
-    <main style={{ padding: '2rem' }}>
-      <h1>Notely by Murtaza</h1>
+    <main className="p-4 bg-white text-black dark:bg-gray-900 dark:text-white min-h-screen">
+      {/* Page title */}
+      <h1 className="text-2xl font-bold mb-4">Notely by Murtaza</h1>
 
       {/* Form to add a new note */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
+      <form onSubmit={handleSubmit} className="mb-4">
         <input
           type="text"
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Write a new note..."
-          style={{ padding: '0.5rem', marginRight: '0.5rem', width: '300px' }}
+          className="p-2 mr-2 w-72 rounded border dark:bg-gray-800 dark:border-gray-700"
         />
-        <button type="submit" style={{ padding: '0.5rem 1rem' }}>
+        <button
+          type="submit"
+          className="p-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
           Add Note
         </button>
       </form>
 
-      {/* Display notes */}
+      {/* Display all notes */}
       <ul>
         {notes.map((note) => (
-          <li key={note.id}>{note.content}</li>
+          <li
+            key={note.id}
+            className="p-2"
+          >
+            {note.content}
+          </li>
         ))}
       </ul>
     </main>
