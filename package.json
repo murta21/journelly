@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.52.0",
-    "@tailwindcss/cli": "^4.1.11",
-    "@tailwindcss/upgrade": "^4.1.11",
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
