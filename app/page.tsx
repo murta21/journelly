@@ -48,6 +48,25 @@ export default function Page() {
     }
   }
 
+  async function handleDelete(id: number) {
+  try {
+    const res = await fetch('/api/notes', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+
+    if (res.ok) {
+      setNotes((prev) => prev.filter((note) => note.id !== id));
+    } else {
+      console.error('Failed to delete note');
+    }
+  } catch (error) {
+    console.error('Request failed:', error);
+  }
+}
+
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 px-4 py-10">
       {/* Centered title */}
@@ -80,9 +99,15 @@ export default function Page() {
           {notes.map((note) => (
             <li
               key={note.id}
-              className="p-4 border border-gray-200 rounded-md bg-gray-50 hover:bg-gray-100 transition"
+              className="p-4 border border-gray-200 rounded-md bg-gray-50 hover:bg-gray-100 transition flex justify-between items-center"
             >
-              {note.content}
+              <span>{note.content}</span>
+              <button
+                onClick={() => handleDelete(note.id)}
+                className="text-sm text-red-500 hover:text-red-700"
+              >
+                Delete
+              </button>
             </li>
           ))}
         </ul>
