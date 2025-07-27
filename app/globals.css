@@ -112,90 +112,6 @@
   }
 }
 
-/* === Starry Sky Animation Styles === */
-
-/* The container is hidden by default and only appears in dark mode */
-.starry-sky-container {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0; /* Position it behind everything, including the forest background */
-}
-
-/* This is the key rule: when the body has the 'dark' class, show the stars. */
-.dark .starry-sky-container {
-  display: block;
-}
-
-/* Styles for an individual twinkling star */
-.star {
-  position: absolute;
-  width: var(--star-size);
-  height: var(--star-size);
-  background-color: white;
-  border-radius: 50%;
-  animation: twinkle var(--animation-duration) ease-in-out var(--animation-delay) infinite;
-}
-
-/* Keyframe animation for the twinkling effect */
-@keyframes twinkle {
-  0%, 100% {
-    opacity: 0.2;
-    transform: scale(0.8);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.2);
-  }
-}
-
-/* === Starry Sky Animation Styles === */
-
-/* The container is hidden by default and only appears in dark mode */
-.starry-sky-container {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0; /* Position it behind everything, including the forest background */
-}
-
-/* This is the key rule: when the body has the 'dark' class, show the stars. */
-.dark .starry-sky-container {
-  display: block;
-}
-
-/* Styles for an individual twinkling star */
-.star {
-  position: absolute;
-  width: var(--star-size);
-  height: var(--star-size);
-  background-color: white;
-  border-radius: 50%;
-  animation: twinkle var(--animation-duration) ease-in-out var(--animation-delay) infinite;
-}
-
-/* Keyframe animation for the twinkling effect */
-@keyframes twinkle {
-  0%, 100% {
-    opacity: 0.2;
-    transform: scale(0.8);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.2);
-  }
-}
-
 /* === Shooting Star Styles === */
 
 .shooting-star {
@@ -221,7 +137,7 @@
 @keyframes shoot {
   0% {
     /* Start invisible and off-screen (top-right), with corrected rotation */
-    transform: translateX(400vw) translateY(-200vh) rotate(120deg);
+    transform: translateX(400vw) translateY(-200vh) rotate(150deg);
     opacity: 0;
   }
   /* Wait for a while before starting */
@@ -234,7 +150,7 @@
   }
   100% {
     /* Travel down and left, ending around 40% viewport height, and fade out */
-    transform: translateX(-30vw) translateY(60vh) rotate(150deg);
+    transform: translateX(0vw) translateY(20vh) rotate(160deg);
     opacity: 0;
   }
 }
