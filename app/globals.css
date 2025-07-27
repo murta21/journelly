@@ -137,7 +137,7 @@
 @keyframes shoot {
   0% {
     /* Start invisible and off-screen (top-right), with corrected rotation */
-    transform: translateX(400vw) translateY(-200vh) rotate(150deg);
+    transform: translateX(450vw) translateY(-200vh) rotate(145deg);
     opacity: 0;
   }
   /* Wait for a while before starting */
@@ -150,7 +150,7 @@
   }
   100% {
     /* Travel down and left, ending around 40% viewport height, and fade out */
-    transform: translateX(0vw) translateY(20vh) rotate(160deg);
+    transform: translateX(1vh) translateY(20vh) rotate(160deg);
     opacity: 0;
   }
 }
