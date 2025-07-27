@@ -1,22 +1,28 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-export default function ThemeToggle() {
-  // The theme now only exists for the current session, defaulting to 'light'.
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+type Theme = 'light' | 'dark';
 
-  // When the theme state changes, toggle the 'dark' class on the page.
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-  }, [theme]);
+// We receive the initial theme from the server component (layout.tsx) as a prop.
+export default function ThemeToggle({ initialTheme }: { initialTheme: Theme }) {
+  const [theme, setTheme] = useState<Theme>(initialTheme);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    // Set the cookie to expire in one year.
+    document.cookie = `theme=${newTheme}; path=/; max-age=31536000; SameSite=Lax`;
+    // Manually update the class on the html element.
+    document.documentElement.className = newTheme;
+  };
 
   return (
     <button
-      onClick={() => setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))}
+      onClick={toggleTheme}
       className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white rounded"
     >
-      Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
+      Toggle to {theme === 'light' ? 'Dark' : 'Light'} Mode
     </button>
   );
 }

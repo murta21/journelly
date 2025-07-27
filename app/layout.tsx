@@ -1,9 +1,9 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import ThemeToggle from './ThemeToggle';
 import BirdAnimations from './BirdAnimations';
-import ThemeScript from './ThemeScript';
-import StarrySky from './StarrySky'; // 1. Import the new StarrySky component
+import StarrySky from './StarrySky';
 
 export const metadata: Metadata = {
   title: 'Notely',
@@ -13,27 +13,30 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// Make the component async to correctly handle the cookies function
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // By splitting this into two lines, we help TypeScript correctly infer the type.
+  const cookieStore = await cookies();
+  const theme = cookieStore.get('theme')?.value || 'light';
+
+  // Apply the theme class directly to the <html> tag during server render.
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={theme}>
       <head>
-        <ThemeScript />
+        {/* Make sure ThemeScript.tsx is deleted as it's no longer needed */}
       </head>
-      {/* 2. Update the dark mode background color to a deep blue-black */}
       <body className="relative min-h-screen bg-gray-50 text-gray-900 dark:bg-[#0d1117] dark:text-white">
         
-        <StarrySky /> {/* 3. Add the StarrySky component */}
-
-        {/* Background image layer */}
-        <div className="absolute inset-0 z-0 bg-[url('/forest-bottom.png')] bg-no-repeat bg-bottom bg-cover dark:brightness-50 opacity-90" />
-
+        <StarrySky />
         <BirdAnimations />
 
-        {/* Foreground content */}
+        <div className="absolute inset-0 z-0 bg-[url('/forest-bottom.png')] bg-no-repeat bg-bottom bg-cover dark:brightness-50 opacity-90" />
+
         <div className="relative z-10 flex flex-col min-h-screen">
           <header className="p-4 border-b border-gray-300 dark:border-gray-700 flex justify-between items-center">
             <h1 className="text-xl font-bold">🌲 Notely</h1>
-            <ThemeToggle />
+            {/* Pass the initial theme to the toggle component */}
+            <ThemeToggle initialTheme={theme as 'light' | 'dark'} />
           </header>
           <main className="flex-1 p-4">{children}</main>
         </div>
