@@ -1,6 +1,8 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import ThemeToggle from './ThemeToggle'; // adjust the path if needed
+import ThemeToggle from './ThemeToggle';
+import BirdAnimations from './BirdAnimations';
+import ThemeScript from './ThemeScript';
 
 export const metadata: Metadata = {
   title: 'Notely',
@@ -12,10 +14,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body className="relative min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white">
         {/* Background image layer */}
         <div className="absolute inset-0 z-0 bg-[url('/forest-bottom.png')] bg-no-repeat bg-bottom bg-cover dark:brightness-75 opacity-90" />
+
+        <BirdAnimations />
 
         {/* Foreground content */}
         <div className="relative z-10 flex flex-col min-h-screen">

@@ -2,21 +2,24 @@
 
 import { useEffect, useState } from 'react';
 
-export default function ThemeToggle() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  // On mount, load saved theme
-  useEffect(() => {
-    const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    if (saved) {
-      setTheme(saved);
-      document.documentElement.classList[saved === 'dark' ? 'add' : 'remove']('dark');
+// This helper function safely gets the initial theme on the client side.
+const getInitialTheme = (): 'light' | 'dark' => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const savedTheme = window.localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      return 'dark';
     }
-  }, []);
+  }
+  return 'light';
+};
 
-  // When theme changes, apply class and save it
+export default function ThemeToggle() {
+  // Initialize state directly from localStorage.
+  const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
+
+  // This effect now only runs when the theme is changed by the user.
   useEffect(() => {
-    document.documentElement.classList[theme === 'dark' ? 'add' : 'remove']('dark');
+    document.documentElement.classList.toggle('dark', theme === 'dark');
     localStorage.setItem('theme', theme);
   }, [theme]);
 
