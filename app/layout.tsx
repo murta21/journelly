@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import ThemeToggle from './ThemeToggle';
 import BirdAnimations from './BirdAnimations';
 import ThemeScript from './ThemeScript';
+import StarrySky from './StarrySky'; // 1. Import the new StarrySky component
 
 export const metadata: Metadata = {
   title: 'Notely',
@@ -18,9 +19,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <ThemeScript />
       </head>
-      <body className="relative min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white">
+      {/* 2. Update the dark mode background color to a deep blue-black */}
+      <body className="relative min-h-screen bg-gray-50 text-gray-900 dark:bg-[#0d1117] dark:text-white">
+        
+        <StarrySky /> {/* 3. Add the StarrySky component */}
+
         {/* Background image layer */}
-        <div className="absolute inset-0 z-0 bg-[url('/forest-bottom.png')] bg-no-repeat bg-bottom bg-cover dark:brightness-75 opacity-90" />
+        <div className="absolute inset-0 z-0 bg-[url('/forest-bottom.png')] bg-no-repeat bg-bottom bg-cover dark:brightness-50 opacity-90" />
 
         <BirdAnimations />
 
