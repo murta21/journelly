@@ -24,6 +24,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" className={theme}>
       <head>
         {/* Make sure ThemeScript.tsx is deleted as it's no longer needed */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className="relative min-h-screen bg-gray-50 text-gray-900 dark:bg-[#0d1117] dark:text-white">
         
