@@ -10,6 +10,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        // Set 'Quicksand' as the default sans-serif font
+        sans: ['var(--font-quicksand)', 'sans-serif'],
+        // Keep 'Caveat' for the sticky notes
         caveat: ['Caveat', 'cursive'],
       },
     },

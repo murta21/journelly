@@ -13,8 +13,12 @@ export default function ThemeToggle({ initialTheme }: { initialTheme: Theme }) {
     setTheme(newTheme);
     // Set the cookie to expire in one year.
     document.cookie = `theme=${newTheme}; path=/; max-age=31536000; SameSite=Lax`;
-    // Manually update the class on the html element.
-    document.documentElement.className = newTheme;
+
+    // --- THE FIX ---
+    // Instead of replacing the whole className, we specifically remove the old
+    // theme and add the new one, leaving the font class untouched.
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(newTheme);
   };
 
   return (

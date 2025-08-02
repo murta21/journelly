@@ -154,3 +154,57 @@
     opacity: 0;
   }
 }
+
+/* === Sticky Note Flip Animation Styles (Diagonal Flip) === */
+
+/* The scene container for the 3D effect */
+.note-scene {
+  perspective: 1000px;
+}
+
+/* The inner container that actually flips */
+.note-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s; /* A slightly slower transition for a better feel */
+  transform-style: preserve-3d;
+}
+
+/* Apply the diagonal flip transformation when this class is present */
+.note-card-inner.is-flipped {
+  transform: rotate3d(-1, 1, 0, 180deg);
+}
+
+/* Common styles for both front and back faces of the note */
+.note-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Front face styles */
+.note-front {
+  background-color: #fef08a; /* A nice sticky note yellow */
+}
+.dark .note-front {
+  background-color: #facc15; /* A slightly darker yellow for dark mode */
+}
+
+/* Back face styles */
+.note-back {
+  background-color: #fef9c3; /* A lighter yellow for the back */
+  /* Pre-rotate the back face along the same diagonal axis */
+  transform: rotate3d(-1, 1, 0, 180deg);
+}
+.dark .note-back {
+  background-color: #fde047;
+}

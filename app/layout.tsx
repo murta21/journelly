@@ -5,30 +5,40 @@ import ThemeToggle from './ThemeToggle';
 import BirdAnimations from './BirdAnimations';
 import StarrySky from './StarrySky';
 
+// 1. Import the new font
+import { Quicksand } from 'next/font/google';
+
+// 2. Configure the font
+const quicksand = Quicksand({
+  subsets: ['latin'],
+  variable: '--font-quicksand', // Use a CSS variable
+});
+
+// 3. Update the site metadata
 export const metadata: Metadata = {
-  title: 'Notely',
-  description: 'A simple place to jot down ideas',
+  title: 'Journelly',
+  description: 'A simple place for your journey of ideas',
   icons: {
     icon: '/favicon.ico',
   },
 };
 
-// Make the component async to correctly handle the cookies function
+// The function is now correctly marked as async
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // By splitting this into two lines, we help TypeScript correctly infer the type.
-  const cookieStore = await cookies();
-  const theme = cookieStore.get('theme')?.value || 'light';
+  // We now correctly await the cookies() call
+  const ck = await cookies()
+  const theme = ck.get('theme')?.value || 'light';
 
-  // Apply the theme class directly to the <html> tag during server render.
   return (
-    <html lang="en" className={theme}>
+    <html lang="en" className={`${quicksand.variable} ${theme}`}>
       <head>
-        {/* Make sure ThemeScript.tsx is deleted as it's no longer needed */}
+        {/* Add the Caveat font for the sticky notes */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="relative min-h-screen bg-gray-50 text-gray-900 dark:bg-[#0d1117] dark:text-white">
+      {/* 4. Apply the new font class to the body */}
+      <body className={`relative min-h-screen font-sans bg-gray-50 text-gray-900 dark:bg-[#0d1117] dark:text-white`}>
         
         <StarrySky />
         <BirdAnimations />
@@ -37,8 +47,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         <div className="relative z-10 flex flex-col min-h-screen">
           <header className="p-4 border-b border-gray-300 dark:border-gray-700 flex justify-between items-center">
-            <h1 className="text-xl font-bold">🌲 Notely</h1>
-            {/* Pass the initial theme to the toggle component */}
+            {/* --- UPDATED HEADER --- */}
+            <div>
+              <a
+                href="#" // You can replace this with your portfolio or social media link
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-xs text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors mb-1"
+              >
+                By [Your Name]
+              </a>
+              <h1 className="text-xl font-bold">🌿 Journelly</h1>
+            </div>
             <ThemeToggle initialTheme={theme as 'light' | 'dark'} />
           </header>
           <main className="flex-1 p-4">{children}</main>
