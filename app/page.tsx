@@ -2,122 +2,153 @@
 
 import { useEffect, useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client'; // Use the new client
+import { createClient } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 // The Note type now includes properties for styling the sticky note
 type Note = {
-  id: number;
+  id: number | string; // Local notes will have a string ID
   content: string;
-  rotation: number; // The tilt of the note
-  x: number;        // The horizontal offset
-  y: number;        // The vertical offset
+  rotation: number;
+  x: number;
+  y: number;
+  user_id?: string;
 };
 
-// A helper function to generate the "messy" styles for a note
 const generateNoteStyles = () => {
-  const rotation = Math.random() * 8 - 4; // -4 to 4 degrees
-  const x = Math.random() * 16 - 8;       // -8px to 8px
-  const y = Math.random() * 16 - 8;       // -8px to 8px
+  const rotation = Math.random() * 8 - 4;
+  const x = Math.random() * 16 - 8;
+  const y = Math.random() * 16 - 8;
   return { rotation, x, y };
 };
 
 export default function Page() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [newNote, setNewNote] = useState('');
-  const [flippedNoteId, setFlippedNoteId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Add a loading state
+  const [flippedNoteId, setFlippedNoteId] = useState<number | string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
 
   const charLimit = 300;
   const frontCharLimit = 150;
+  const guestNoteLimit = 3;
 
+  // This effect runs once to check the user's auth state
   useEffect(() => {
-    const checkUserAndFetchNotes = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        // If no user is logged in, redirect to the login page.
-        router.push('/login');
-      } else {
-        // If a user is logged in, fetch their notes.
-        await fetchNotes();
-        setIsLoading(false);
-      }
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+      setIsLoading(false);
     };
-    checkUserAndFetchNotes();
-  }, [router, supabase]);
+    checkUser();
+  }, [supabase]);
 
-  async function fetchNotes() {
-    try {
-      const res = await fetch('/api/notes');
-      const data = await res.json();
-      
-      if (Array.isArray(data)) {
-        const styledNotes = data.map((note: { id: number; content: string }) => ({
-          ...note,
-          ...generateNoteStyles(),
-        }));
-        setNotes(styledNotes);
-      } else {
-        console.error('Failed to fetch notes, received:', data);
+  // This effect runs when the user state changes (e.g., after login)
+  useEffect(() => {
+    if (user) {
+      // User is logged in, fetch from DB
+      fetchNotesFromDB();
+    } else if (!isLoading) {
+      // User is a guest, fetch from localStorage
+      fetchNotesFromLocal();
+    }
+  }, [user, isLoading]);
+
+  // Handle login event to save local notes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN') {
+        const localNotes = JSON.parse(localStorage.getItem('guestNotes') || '[]');
+        if (localNotes.length > 0) {
+          // Send local notes to be saved to the new user's account
+          await fetch('/api/notes/batch-insert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ notes: localNotes }),
+          });
+          localStorage.removeItem('guestNotes');
+        }
+        // Refresh the user state and fetch notes from DB
+        setUser(session?.user ?? null);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
         setNotes([]);
       }
-    } catch (error) {
-      console.error('Failed to fetch notes:', error);
-    }
-  }
+    });
 
-  async function handleSubmit(e: FormEvent) {
+    return () => subscription.unsubscribe();
+  }, [supabase]);
+
+
+  // --- Data Fetching Logic ---
+  const fetchNotesFromDB = async () => {
+    const { data } = await supabase.from('notes').select('*').order('created_at');
+    if (data) {
+      const styledNotes = data.map((note) => ({ ...note, ...generateNoteStyles() }));
+      setNotes(styledNotes);
+    }
+  };
+
+  const fetchNotesFromLocal = () => {
+    const localNotes: Note[] = JSON.parse(localStorage.getItem('guestNotes') || '[]');
+    const styledNotes = localNotes.map((note) => ({ ...note, ...generateNoteStyles() }));
+    setNotes(styledNotes);
+  };
+
+  // --- Form Submission Logic ---
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!newNote.trim()) return;
 
-    try {
-      const res = await fetch('/api/notes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: newNote }),
-      });
-
-      if (res.ok) {
-        const addedNote = await res.json();
-        setNotes((prev) => [
-          ...prev,
-          { ...addedNote, ...generateNoteStyles() },
-        ]);
-        setNewNote('');
-        setFlippedNoteId(null);
-      } else {
-        console.error('Failed to add note');
+    if (user) {
+      // Logged-in user: save to DB
+      const { data } = await supabase
+        .from('notes')
+        .insert({ content: newNote, user_id: user.id })
+        .select()
+        .single();
+      if (data) {
+        setNotes((prev) => [...prev, { ...data, ...generateNoteStyles() }]);
       }
-    } catch (err) {
-      console.error('Request failed:', err);
-    }
-  }
-
-  async function handleDelete(id: number) {
-    try {
-      const res = await fetch('/api/notes', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      });
-
-      if (res.ok) {
-        setNotes((prev) => prev.filter((note) => note.id !== id));
-        setFlippedNoteId(null);
-      } else {
-        console.error('Failed to delete note');
+    } else {
+      // Guest user: save to localStorage
+      if (notes.length >= guestNoteLimit) {
+        alert('Please sign up to save more than 10 notes!');
+        return;
       }
-    } catch (error) {
-      console.error('Request failed:', error);
+      const localNote: Note = {
+        id: `local-${Date.now()}`,
+        content: newNote,
+        ...generateNoteStyles(),
+      };
+      const updatedLocalNotes = [...notes, localNote];
+      localStorage.setItem('guestNotes', JSON.stringify(updatedLocalNotes));
+      setNotes(updatedLocalNotes);
     }
-  }
+    setNewNote('');
+    setFlippedNoteId(null);
+  };
 
-  const handleFlip = (id: number) => {
+  // --- Deletion Logic ---
+  const handleDelete = async (id: number | string) => {
+    if (user) {
+      // Logged-in user: delete from DB
+      await supabase.from('notes').delete().eq('id', id);
+    } else {
+      // Guest user: delete from localStorage
+      const updatedLocalNotes = notes.filter((note) => note.id !== id);
+      localStorage.setItem('guestNotes', JSON.stringify(updatedLocalNotes));
+    }
+    setNotes((prev) => prev.filter((note) => note.id !== id));
+    setFlippedNoteId(null);
+  };
+
+  const handleFlip = (id: number | string) => {
     setFlippedNoteId((prevId) => (prevId === id ? null : id));
   };
 
-  // Show a loading message while we check for the user
   if (isLoading) {
     return <div className="text-center mt-16">Loading...</div>;
   }
@@ -125,7 +156,8 @@ export default function Page() {
   return (
     <div className="px-4 py-10">
       <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+        {/* Apply the new font and styles to the title */}
+        <h1 className="text-5xl font-brand text-gray-900 dark:text-white">
           Journ<span className="text-green-600">e</span>lly
         </h1>
         <p className="text-gray-600 dark:text-gray-300 mt-2">A simple place for your journey of ideas</p>
@@ -153,6 +185,18 @@ export default function Page() {
             {newNote.length} / {charLimit}
           </p>
         </form>
+
+        {!user && notes.length >= guestNoteLimit && (
+          <div className="text-center p-4 mb-4 bg-green-100 dark:bg-green-900/50 rounded-lg">
+            <p className="text-green-800 dark:text-green-200">
+              You've reached the guest limit!{' '}
+              <a href="/login" className="font-bold underline hover:text-green-600">
+                Sign up
+              </a>{' '}
+              to save these notes and create more.
+            </p>
+          </div>
+        )}
 
         <div className="relative w-80 h-80 mx-auto">
           {notes.length > 0 ? (
@@ -211,7 +255,7 @@ export default function Page() {
             ))
           ) : (
             <div className="text-center text-gray-500 dark:text-gray-400 pt-16">
-              No notes yet. Add your first note above!
+              Once upon a time there was a note, this note was lost under a pile of many others...
             </div>
           )}
         </div>
