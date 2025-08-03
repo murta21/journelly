@@ -115,7 +115,7 @@ export default function Page() {
     } else {
       // Guest user: save to localStorage
       if (notes.length >= guestNoteLimit) {
-        alert('Please sign up to save more than 10 notes!');
+        alert('Please sign up to create more notes!');
         return;
       }
       const localNote: Note = {
@@ -193,7 +193,7 @@ export default function Page() {
               <a href="/login" className="font-bold underline hover:text-green-600">
                 Sign up
               </a>{' '}
-              to save these notes and create more.
+              to save notes and create more.
             </p>
           </div>
         )}
