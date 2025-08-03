@@ -14,7 +14,7 @@ const BirdAnimations = () => {
     // duration, and vertical position. This makes the animation feel more natural.
     const birdStyle = {
       '--animation-delay': `${5 + Math.random() * 20}s`,
-      '--animation-duration': `${20 + Math.random() * 15}s`, // Fly across in 15-30 seconds
+      '--animation-duration': `${33 + Math.random() * 15}s`, // Fly across in 15-33 seconds
       top: `${11 + Math.random() * 48}%`, // Position birds in the top 10% to 50% of the screen
     } as React.CSSProperties;
 

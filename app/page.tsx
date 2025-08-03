@@ -255,7 +255,7 @@ export default function Page() {
             ))
           ) : (
             <div className="text-center text-gray-500 dark:text-gray-400 pt-16">
-              Once upon a time there was a note, this note was lost under a pile of many others...
+              Once upon a time, there was a note. This note was lost under a pile of many others...
             </div>
           )}
         </div>
