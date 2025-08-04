@@ -1,5 +1,4 @@
 import React from 'react';
-import Bird from './Bird'; // 1. Import the new Bird component
 
 /**
  * A component that renders multiple flying bird animations.
@@ -19,10 +18,7 @@ const BirdAnimations = () => {
       top: `${11 + Math.random() * 48}%`, // Position birds in the top 10% to 50% of the screen
     } as React.CSSProperties;
 
-    birds.push(
-      <div key={i} className="bird" style={birdStyle}>
-      </div>
-    );
+    birds.push(<div key={i} className="bird" style={birdStyle}></div>);
   }
 
   return <div className="bird-container">{birds}</div>;
