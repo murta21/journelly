@@ -6,11 +6,17 @@ import BirdAnimations from './BirdAnimations';
 import StarrySky from './StarrySky';
 import { createClient } from '@/lib/supabase/server';
 
-import { Quicksand } from 'next/font/google';
+import { Quicksand, Caveat } from 'next/font/google';
 
 const quicksand = Quicksand({
   subsets: ['latin'],
   variable: '--font-quicksand',
+});
+
+const caveat = Caveat({
+  subsets: ['latin'],
+  variable: '--font-caveat',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -26,12 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const theme = ck.get('theme')?.value || 'light';
 
   return (
-    <html lang="en" className={`${quicksand.variable} ${theme}`}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet" />
-      </head>
+    <html lang="en" className={`${quicksand.variable} ${caveat.variable} ${theme}`}>
       <body className={`relative min-h-screen font-sans bg-gray-50 text-gray-900 dark:bg-[#0d1117] dark:text-white`}>
         
         <StarrySky />

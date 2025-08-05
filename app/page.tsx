@@ -170,7 +170,7 @@ export default function Page() {
               type="text"
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
-              placeholder="Start your journey..."
+              placeholder="Jot something down..."
               maxLength={charLimit}
               className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-green-500 focus:border-green-500"
             />

@@ -11,9 +11,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['var(--font-quicksand)', 'sans-serif'],
-        caveat: ['Caveat', 'cursive'],
-        // Update the brand font to use Nerko One
-        brand: ['var(--font-nerko-one)', 'cursive'],
+        caveat: ['var(--font-caveat)', 'cursive'],
       },
     },
   },
