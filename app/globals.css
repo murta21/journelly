@@ -133,11 +133,11 @@
 @keyframes shoot {
   0% {
     /* Start invisible and off-screen (top-right), with corrected rotation */
-    transform: translateX(100vw) translateY(-30vh) rotate(160deg);
+    transform: translateX(100vw) translateY(-30vh) rotate(170deg);
     opacity: 1;
   }
   80% {
-    /* Travel down and left, ending around 4 % viewport height, and fade out */
+    /* Travel down and left, ending around 0 % viewport height, and fade out */
     transform: translateX(1vh) translateY(0vh) rotate(166deg);
     opacity: 0;
   }
@@ -164,7 +164,7 @@
 
 /* Apply the diagonal flip transformation when this class is present */
 .note-card-inner.is-flipped {
-  transform: rotate3d(-1, 1, 0, 180deg);
+  transform: translateX(-50%) rotateY(-180deg) translateX(-50%);
 }
 
 /* Common styles for both front and back faces of the note */
@@ -194,7 +194,7 @@
 .note-back {
   background-color: #fef9c3; /* A lighter yellow for the back */
   /* Pre-rotate the back face along the same diagonal axis */
-  transform: rotate3d(-1, 1, 0, 180deg);
+  transform: rotateY(180deg);
 }
 .dark .note-back {
   background-color: #fde047;
