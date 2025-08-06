@@ -26,8 +26,9 @@ const StarrySky = () => {
   for (let i = 0; i < shootingStarCount; i++) {
     const shootingStarStyle = {
       // Give them a very long, random animation duration to make them appear infrequently
-      '--animation-duration': `${10 + Math.random() * 20}s`, 
-      '--animation-delay': `${5 + Math.random() * 10}s`,
+      '--animation-duration': `${ 5 + Math.random() * 20}s`, 
+      // This will now generate a delay between 1 and 2 seconds.
+      '--animation-delay': `${3 + Math.random()}s`,
       // Randomize the starting vertical position
       top: `${Math.random() * 50}%`, // Appear in the top half of the sky
     } as React.CSSProperties;
