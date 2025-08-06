@@ -121,7 +121,7 @@
   filter: drop-shadow(0 0 6px white);
 
   /* Start with an opacity of 0 so the stars are invisible by default */
-  opacity: 0;
+  opacity: 1;
   
   /* The animation now controls the position and rotation completely */
   animation: shoot var(--animation-duration) ease-in-out var(--animation-delay) infinite;
@@ -133,17 +133,15 @@
 @keyframes shoot {
   0% {
     /* Start invisible and off-screen (top-right), with corrected rotation */
-    transform: translateX(400vw) translateY(-160vh) rotate(148deg);
+    transform: translateX(100vw) translateY(-30vh) rotate(160deg);
     opacity: 1;
   }
-  /* Wait for a while before starting */
-  70% {
-    /* Appear and begin the journey */
-    opacity: 1;
+  80% {
+    /* Travel down and left, ending around 4 % viewport height, and fade out */
+    transform: translateX(1vh) translateY(0vh) rotate(166deg);
+    opacity: 0;
   }
   100% {
-    /* Travel down and left, ending around 4 % viewport height, and fade out */
-    transform: translateX(1vh) translateY(2vh) rotate(158deg);
     opacity: 0;
   }
 }
