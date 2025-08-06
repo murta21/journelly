@@ -31,8 +31,8 @@ export default function Page() {
   const router = useRouter();
   const supabase = createClient();
 
-  const charLimit = 300;
-  const frontCharLimit = 150;
+  const charLimit = 290;
+  const frontCharLimit = 160;
   const guestNoteLimit = 3;
 
   // This effect runs once to check the user's auth state
