@@ -26,7 +26,7 @@
   position: absolute;
   /* Start off-screen to the left, using a fixed value */
   left: -20px;
-  width: 30;
+  width: 30px;
   height: 20px;
   background-image: url('/flying-dove.svg');
   background-size: contain;
