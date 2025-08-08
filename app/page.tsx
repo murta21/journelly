@@ -58,28 +58,55 @@ export default function Page() {
 
   // Handle login event to save local notes
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    async (event, session) => {
+      // 1) tell server to set/clear cookies
+      await fetch('/auth/callback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event, session }),
+        credentials: 'include',
+      })
+
+      // 2) your current migration logic on sign-in
       if (event === 'SIGNED_IN') {
-        const localNotes = JSON.parse(localStorage.getItem('guestNotes') || '[]');
+        const localNotes = JSON.parse(localStorage.getItem('guestNotes') || '[]')
         if (localNotes.length > 0) {
-          // Send local notes to be saved to the new user's account
           await fetch('/api/notes/batch-insert', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ notes: localNotes }),
-          });
-          localStorage.removeItem('guestNotes');
+          })
+          localStorage.removeItem('guestNotes')
         }
-        // Refresh the user state and fetch notes from DB
-        setUser(session?.user ?? null);
+        setUser(session?.user ?? null)
       } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setNotes([]);
+        setUser(null)
+        setNotes([])
       }
-    });
 
-    return () => subscription.unsubscribe();
-  }, [supabase]);
+      // 3) make layout re-run server code to switch Login→Logout
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        router.refresh()
+      }
+    }
+  )
+  return () => subscription.unsubscribe()
+}, [supabase, router])
+
+useEffect(() => {
+  (async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    await fetch('/auth/callback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: 'INITIAL_SESSION', session }),
+      credentials: 'include',
+    })
+    // optional: 
+    router.refresh()
+  })()
+}, [supabase])
 
 
   // --- Data Fetching Logic ---

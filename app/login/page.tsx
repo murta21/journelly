@@ -11,30 +11,36 @@ export default function LoginPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN') {
-        router.refresh()
-        router.push('/')
-      }
-    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        // 🔐 persist/clear server cookies so layout can see `user`
+        await fetch('/auth/callback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event, session }),
+          credentials: 'include',          // <— important
+        })
 
-    return () => {
-      subscription?.unsubscribe()
-    }
+        if (event === 'SIGNED_IN') {
+          router.refresh()
+          router.push('/')
+        } else if (event === 'SIGNED_OUT') {
+          router.refresh()
+        }
+      }
+    )
+
+    return () => subscription?.unsubscribe()
   }, [supabase, router])
 
   return (
     <div className="max-w-md mx-auto mt-16 p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-      {/* --- MOVED CLOSE LINK --- */}
       <div className="flex justify-end mb-4">
-        <a 
-          href="/" 
-          className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-          aria-label="Close"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+        <a href="/" className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200" aria-label="Close">
+          {/* X icon */}
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round"
+               strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
         </a>
       </div>
 

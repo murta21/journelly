@@ -20,6 +20,8 @@ const caveat = Caveat({
   display: 'swap',
 });
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Journelly',
   description: 'A simple place for your journey of ideas',
