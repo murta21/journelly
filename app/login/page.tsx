@@ -13,7 +13,7 @@ export default function LoginPage() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // 🔐 persist/clear server cookies so layout can see `user`
+        // persist/clear server cookies so layout can see `user`
         await fetch('/auth/callback', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -49,9 +49,9 @@ export default function LoginPage() {
       </h1>
       <Auth
         supabaseClient={supabase}
+        theme="dark"
         appearance={{ theme: ThemeSupa }}
         providers={['google']}
-        theme="dark"
       />
     </div>
   )
