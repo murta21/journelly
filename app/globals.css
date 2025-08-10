@@ -6,14 +6,15 @@
 .supabase-auth input,
 .supabase-auth select,
 .supabase-auth textarea {
-  background-color: #0b1220 !important;
+  background-color: #242424 !important;
   color: #ffffff !important;
-  border-color: #334155 !important;
+  border-color: #4178c6 !important;
 }
 .supabase-auth input:-webkit-autofill {
   -webkit-text-fill-color: #ffffff !important;
   box-shadow: 0 0 0 1000px #0b1220 inset !important;
 }
+
 
 
 /* === Bird Animation Styles === */
