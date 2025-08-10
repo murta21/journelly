@@ -49,7 +49,7 @@ export default function LoginPage() {
       </h1>
       <Auth
         supabaseClient={supabase}
-        theme="dark"
+        theme="auto"
         appearance={{
           theme: ThemeSupa,
           className: {
