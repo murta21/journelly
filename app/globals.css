@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+.supabase-auth { color-scheme: dark; }
+.supabase-auth input,
+.supabase-auth select,
+.supabase-auth textarea {
+  background-color: #0b1220 !important;
+  color: #ffffff !important;
+  border-color: #334155 !important;
+}
+.supabase-auth input:-webkit-autofill {
+  -webkit-text-fill-color: #ffffff !important;
+  box-shadow: 0 0 0 1000px #0b1220 inset !important;
+}
+
+
 /* === Bird Animation Styles === */
 
 /* This container holds the birds and is hidden in dark mode */

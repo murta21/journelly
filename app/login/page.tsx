@@ -50,7 +50,36 @@ export default function LoginPage() {
       <Auth
         supabaseClient={supabase}
         theme="dark"
-        appearance={{ theme: ThemeSupa }}
+        appearance={{
+          theme: ThemeSupa,
+          className: {
+            container: 'supabase-auth',                // was: className: 'supabase-auth'
+            input: 'bg-[#0b1220] text-white border-slate-600',
+            anchor: 'text-gray-400 hover:text-gray-200',
+            button: 'bg-emerald-500 hover:bg-emerald-600',
+          },
+          variables: {
+            dark: {
+              colors: {
+                brand: '#10b981',
+                brandAccent: '#059669',
+                inputBackground: '#0b1220', // near-black
+                inputText: '#ffffff',
+                inputBorder: '#334155',
+              },
+            },
+            default: {
+              colors: {
+                brand: '#10b981',
+                brandAccent: '#059669',
+                inputBackground: '#ffffff',
+                inputText: '#0f172a',
+                inputBorder: '#d1d5db',
+              },
+              radii: { inputBorderRadius: '12px', buttonBorderRadius: '12px' },
+            }
+          },
+        }}
         providers={['google']}
       />
     </div>
