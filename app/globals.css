@@ -6,9 +6,9 @@
 .supabase-auth input,
 .supabase-auth select,
 .supabase-auth textarea {
-  background-color: #242424 !important;
+  background-color: #292929 !important;
   color: #ffffff !important;
-  border-color: #4d4d4d !important;
+  border-color: #3f6cab !important;
 }
 .supabase-auth input:-webkit-autofill {
   -webkit-text-fill-color: #ffffff !important;
