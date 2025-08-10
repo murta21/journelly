@@ -8,7 +8,7 @@
 .supabase-auth textarea {
   background-color: #242424 !important;
   color: #ffffff !important;
-  border-color: #4178c6 !important;
+  border-color: #4d4d4d !important;
 }
 .supabase-auth input:-webkit-autofill {
   -webkit-text-fill-color: #ffffff !important;
