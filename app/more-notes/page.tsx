@@ -55,7 +55,7 @@ export default function MoreNotesPage() {
               display: 'inline-block', 
               transform: 'rotate(-12deg)',
               // Here is the color property you were looking for
-              color: '#c05621' 
+              color: '#ffe600ee' 
             }}
           >e</span>l
         </h1>

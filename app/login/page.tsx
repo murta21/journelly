@@ -13,13 +13,6 @@ export default function LoginPage() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // persist/clear server cookies so layout can see `user`
-        await fetch('/auth/callback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ event, session }),
-          credentials: 'include',          // <— important
-        })
 
         if (event === 'SIGNED_IN') {
           router.refresh()
@@ -39,7 +32,7 @@ export default function LoginPage() {
         <a href="/" className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200" aria-label="Close">
           {/* X icon */}
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round"
+               viewBox="0 0 24 24" stroke="red"><path strokeLinecap="round"
                strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
         </a>
       </div>

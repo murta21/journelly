@@ -61,12 +61,6 @@ export default function Page() {
   const { data: { subscription } } = supabase.auth.onAuthStateChange(
     async (event, session) => {
       // 1) tell server to set/clear cookies
-      await fetch('/auth/callback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ event, session }),
-        credentials: 'include',
-      })
 
       // 2) your current migration logic on sign-in
       if (event === 'SIGNED_IN') {
@@ -79,6 +73,7 @@ export default function Page() {
           })
           localStorage.removeItem('guestNotes')
         }
+        router.refresh()
         setUser(session?.user ?? null)
       } else if (event === 'SIGNED_OUT') {
         setUser(null)
