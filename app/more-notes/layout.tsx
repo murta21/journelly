@@ -12,7 +12,7 @@ export default function MoreNotesLayout({
       <div
         aria-hidden
         className="fixed inset-0 z-[1] pointer-events-none
-                   bg-[url('/notesbg3.png')] bg-cover bg-center bg-no-repeat
+                   bg-[url('/notesbg3.avif')] bg-cover bg-center bg-no-repeat
                    animate-slide-in-right"
       />
       {/* This div ensures the page content appears above the new background. */}
