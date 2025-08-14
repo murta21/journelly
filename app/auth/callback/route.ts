@@ -1,6 +1,7 @@
 // app/auth/callback/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { revalidatePath } from 'next/cache'; // <-- IMPORT THIS
 
 export async function POST(req: NextRequest) {
   const body = await req.json(); // { event, session }
@@ -40,6 +41,13 @@ export async function POST(req: NextRequest) {
   // Clear on sign out
   if (event === 'SIGNED_OUT') {
     await supabase.auth.signOut();
+  }
+
+  // --- THIS IS THE FIX ---
+  // When a user signs in or out, we want to invalidate the cache for the
+  // root layout, forcing it to re-render with the new user session.
+  if (['SIGNED_IN', 'SIGNED_OUT'].includes(event)) {
+    revalidatePath('/', 'layout');
   }
 
   return res;

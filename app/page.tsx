@@ -286,8 +286,15 @@ useEffect(() => {
             </div>
           )}
         </div>
+        <div className="text-center mt-8">
+          <a
+            href="/more-notes"
+            className="inline-block px-6 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:shadow-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all"
+          >
+            More Notes...
+          </a>
+          </div>
       </div>
-      
     </div>
   );
 }

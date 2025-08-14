@@ -44,7 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <div className="absolute inset-0 z-0 bg-[url('/forest-bottom.png')] bg-no-repeat bg-bottom bg-cover dark:brightness-50 opacity-90" />
 
         <div className="relative z-10 flex flex-col min-h-screen">
-          <header className="p-4 border-b border-gray-300 dark:border-gray-700 flex justify-between items-center">
+          <header className="relative z-20 p-4 border-b border-gray-300 dark:border-gray-700 flex justify-between items-center">
             <div>
               <a href="#" className="block text-xs text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-green-400 mb-1">
                 made by Murtaza
@@ -63,7 +63,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <ThemeToggle initialTheme={theme as 'light' | 'dark'} />
             </div>
           </header>
-          <main className="flex-1 p-4">{children}</main>
+          <main className="flex-1">{children}</main>
         </div>
       </body>
     </html>
