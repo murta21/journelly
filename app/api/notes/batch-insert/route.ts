@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
   }));
 
   const { error } = await supabase.from('notes').insert(rows);
+  
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

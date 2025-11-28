@@ -13,6 +13,12 @@ export default function LoginPage() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        await fetch('/auth/callback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event, session }),
+          credentials: 'include',
+        })
 
         if (event === 'SIGNED_IN') {
           router.refresh()

@@ -5,6 +5,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { Auth } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
 
 type Note = {
   id: number;
@@ -15,6 +17,7 @@ type Note = {
 export default function MoreNotesPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showLoginOverlay, setShowLoginOverlay] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -22,7 +25,12 @@ export default function MoreNotesPage() {
     const checkUserAndFetchNotes = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        router.push('/login');
+        // User is not logged in: stop loading notes and, after the
+        // background transition finishes, show the login overlay.
+        setIsLoading(false);
+        setTimeout(() => {
+          setShowLoginOverlay(true);
+        }, 600);
       } else {
         const { data } = await supabase
           .from('notes')
@@ -36,7 +44,41 @@ export default function MoreNotesPage() {
       }
     };
     checkUserAndFetchNotes();
-  }, [router, supabase]);
+  }, [supabase]);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        await fetch('/auth/callback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event, session }),
+          credentials: 'include',
+        });
+
+        if (event === 'SIGNED_IN') {
+          setShowLoginOverlay(false);
+          const { data } = await supabase
+            .from('notes')
+            .select('*')
+            .order('created_at', { ascending: false });
+          if (data) {
+            setNotes(data);
+          }
+          setIsLoading(false);
+        } else if (event === 'SIGNED_OUT') {
+          setNotes([]);
+          setIsLoading(false);
+        }
+
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+          router.refresh();
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [supabase, router]);
 
   if (isLoading) {
     return (
@@ -77,6 +119,80 @@ export default function MoreNotesPage() {
       ) : (
         <div className="text-center text-white bg-black/50 p-6 rounded-lg">
           <p>You haven't written any notes yet.</p>
+        </div>
+      )}
+
+      {showLoginOverlay && (
+        <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/60">
+          <div className="max-w-md w-full mx-4 p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg relative">
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={() => router.push('/')}
+                className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
+                aria-label="Close"
+              >
+                {/* X icon */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="red"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <h1 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
+              Welcome to Journelly
+            </h1>
+
+            <Auth
+              supabaseClient={supabase}
+              theme="auto"
+              appearance={{
+                theme: ThemeSupa,
+                className: {
+                  container: 'supabase-auth',
+                  input: 'bg-[#0b1220] text-white border-slate-600',
+                  anchor: 'text-gray-400 hover:text-gray-200',
+                  button: 'bg-emerald-500 hover:bg-emerald-600',
+                },
+                variables: {
+                  dark: {
+                    colors: {
+                      brand: '#10b981',
+                      brandAccent: '#059669',
+                      inputBackground: '#0b1220',
+                      inputText: '#ffffff',
+                      inputBorder: '#4c5056ff',
+                    },
+                  },
+                  default: {
+                    colors: {
+                      brand: '#10b981',
+                      brandAccent: '#059669',
+                      inputBackground: '#ffffff',
+                      inputText: '#0f172a',
+                      inputBorder: '#d1d5db',
+                      defaultButtonBackground: '#292929ff',
+                      defaultButtonBackgroundHover: '#313131ff',
+                      defaultButtonBorder: '#3f6cab',
+                      defaultButtonText: '#ffffffff',
+                    },
+                    radii: { inputBorderRadius: '12px', buttonBorderRadius: '12px' },
+                  },
+                },
+              }}
+              providers={['google']}
+            />
+          </div>
         </div>
       )}
     </div>
