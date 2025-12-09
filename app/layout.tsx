@@ -3,6 +3,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import ThemeToggle from './ThemeToggle';
+import HeaderBranding from './HeaderBranding';
 import BirdAnimations from './BirdAnimations';
 import StarrySky from './StarrySky';
 import { createClient } from '@/lib/supabase/server';
@@ -45,13 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         <div className="relative z-10 flex flex-col min-h-screen">
           <header className="relative z-20 p-4 border-b border-gray-300 dark:border-gray-700 flex justify-between items-center">
-            <div>
-              <a href="#" className="block text-xs text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-green-400 mb-1">
-                made by Murtaza
-              </a>
-              {/* --- UPDATED TITLE --- */}
-              <a href="/" className="text-xl font-bold">🌿 Journelly</a>
-            </div>
+            <HeaderBranding />
             <div className="flex items-center gap-4">
               {user ? (
                 <form action="/auth/logout" method="post">

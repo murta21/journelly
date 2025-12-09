@@ -42,14 +42,14 @@ export default function ThemeToggle({ initialTheme }: { initialTheme: Theme }) {
   // --- THE FIX ---
   // Define the full class strings so Tailwind's JIT compiler can find them.
   const lightClasses = isMoreNotes
-    ? "bg-[#b64926] text-[#5b3412] hover:bg-[#b64926]"
+    ? "bg-[#5C2E0A] text-[#FFD699] hover:bg-[#5C2E0A]"
     : 'bg-sky-200 text-sky-800 hover:bg-sky-300';
   const darkClasses = isMoreNotes
     ? "bg-[#4c2048] text-blue-200 hover:bg-[#4c2048]"
     : 'bg-blue-900 text-blue-200 hover:bg-blue-800';
 
   const buttonStyle = isMoreNotes
-    ? { backgroundColor: theme === 'light' ? '#b64926' : '#4c2048' }
+    ? { backgroundColor: theme === 'light' ? '#5C2E0A' : '#4c2048' }
     : undefined;
 
   // After the component has mounted on the client, we render the fully styled button.

@@ -1,5 +1,7 @@
 // app/more-notes/layout.tsx
 
+import CarAnimation from '../CarAnimation';
+
 export default function MoreNotesLayout({
   children,
 }: {
@@ -15,6 +17,8 @@ export default function MoreNotesLayout({
                    bg-[url('/notesbg3.avif')] bg-cover bg-center bg-no-repeat
                    animate-slide-in-right"
       />
+      {/* Car driving along the road at the bottom */}
+      <CarAnimation />
       {/* This div ensures the page content appears above the new background. */}
       <div className="relative z-10">{children}</div>
     </>

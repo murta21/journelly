@@ -18,28 +18,46 @@ export default function MoreNotesPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showLoginOverlay, setShowLoginOverlay] = useState(false);
+  const [isDark, setIsDark] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
+  // Track dark mode changes
+  useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    checkDarkMode();
+    
+    // Watch for class changes on html element
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const checkUserAndFetchNotes = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        // User is not logged in: stop loading notes and, after the
-        // background transition finishes, show the login overlay.
-        setIsLoading(false);
-        setTimeout(() => {
-          setShowLoginOverlay(true);
-        }, 600);
-      } else {
-        const { data } = await supabase
-          .from('notes')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (data) {
-          setNotes(data);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+          // User is not logged in: stop loading notes and, after the
+          // background transition finishes, show the login overlay.
+          setIsLoading(false);
+          setTimeout(() => {
+            setShowLoginOverlay(true);
+          }, 600);
+        } else {
+          const response = await fetch('/api/notes', { credentials: 'include' });
+          if (response.ok) {
+            const data: Note[] = await response.json();
+            setNotes(data);
+          }
+          setIsLoading(false);
         }
+      } catch (error) {
+        console.error('Error checking user or fetching notes', error);
         setIsLoading(false);
       }
     };
@@ -58,14 +76,15 @@ export default function MoreNotesPage() {
 
         if (event === 'SIGNED_IN') {
           setShowLoginOverlay(false);
-          const { data } = await supabase
-            .from('notes')
-            .select('*')
-            .order('created_at', { ascending: false });
-          if (data) {
-            setNotes(data);
+          try {
+            const response = await fetch('/api/notes', { credentials: 'include' });
+            if (response.ok) {
+              const data: Note[] = await response.json();
+              setNotes(data);
+            }
+          } finally {
+            setIsLoading(false);
           }
-          setIsLoading(false);
         } else if (event === 'SIGNED_OUT') {
           setNotes([]);
           setIsLoading(false);
@@ -83,7 +102,7 @@ export default function MoreNotesPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-white text-2xl bg-black/50 p-4 rounded-lg">Loading your journal...</p>
+        <p className="text-white text-2xl bg-black/50 p-4 rounded-lg">Loading your journel...</p>
       </div>
     );
   }
@@ -124,11 +143,15 @@ export default function MoreNotesPage() {
 
       {showLoginOverlay && (
         <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/60">
-          <div className="max-w-md w-full mx-4 p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg relative">
+          <div 
+            className="max-w-md w-full mx-4 p-8 rounded-lg shadow-lg relative"
+            style={{ backgroundColor: isDark ? '#4c2048' : '#5C2E0A' }}
+          >
             <div className="flex justify-end mb-4">
               <button
                 onClick={() => router.push('/')}
-                className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
+                className="hover:text-white"
+                style={{ color: isDark ? '#bfdbfe' : '#FFD699' }}
                 aria-label="Close"
               >
                 {/* X icon */}
@@ -137,7 +160,7 @@ export default function MoreNotesPage() {
                   className="h-6 w-6"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="red"
+                  stroke="currentColor"
                 >
                   <path
                     strokeLinecap="round"
@@ -149,7 +172,10 @@ export default function MoreNotesPage() {
               </button>
             </div>
 
-            <h1 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
+            <h1 
+              className="text-2xl font-bold text-center mb-6"
+              style={{ color: isDark ? '#bfdbfe' : '#FFD699' }}
+            >
               Welcome to Journelly
             </h1>
 

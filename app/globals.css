@@ -228,3 +228,106 @@
 .dark .note-back {
   background-color: #fde047;
 }
+
+/* === Car Animation Styles === */
+
+/* Container for the car animation - positioned at the bottom of the screen */
+.car-container {
+  position: fixed;
+  bottom: 2%;
+  left: 0;
+  width: 100%;
+  height: 250px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 5; /* Below the login overlay (z-20) */
+}
+
+/* Base car styles */
+.car {
+  position: absolute;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  will-change: left, right, transform;
+}
+
+/* Two lanes/tracks for cars */
+.car.lane-0 {
+  bottom: -58px; /* Bottom lane (closer to road) */
+  z-index: 2; /* Behind lane 1 cars */
+}
+
+.car.lane-1 {
+  bottom: 10px; /* Top lane */
+  z-index: 1; /* In front of lane 0 cars */
+}
+
+/* Car 1 - Orange sedan driving right */
+.car.car1 {
+  left: -500px;
+  width: 412px;
+  height: 222px;
+  background-image: url('/car.png');
+  transform: scaleX(-1);
+  animation: drive-right 25s linear infinite, bumble-right 0.3s ease-in-out infinite;
+}
+
+/* Car 2 - Red SUV driving left */
+.car.car2 {
+  right: -500px;
+  width: 380px;
+  height: 200px;
+  background-image: url('/car2.png');
+  animation: drive-left 35s linear 3s infinite, bumble-left 0.35s ease-in-out infinite;
+}
+
+/* Car 3 - Yellow muscle car driving left */
+.car.car3 {
+  right: -500px;
+  width: 480px;
+  height: 240px;
+  bottom: -15px; /* Lower than default lane-1 */
+  background-image: url('/car3.png');
+  animation: drive-left 28s linear 18s infinite, bumble-left 0.25s ease-in-out infinite;
+}
+
+/* Keyframe animation for driving right (left to right) */
+@keyframes drive-right {
+  0% {
+    left: -500px;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Keyframe animation for driving left (right to left) */
+@keyframes drive-left {
+  0% {
+    right: -500px;
+  }
+  100% {
+    right: 100%;
+  }
+}
+
+/* Bumbling effect for cars driving right */
+@keyframes bumble-right {
+  0%, 100% {
+    transform: scaleX(-1) translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: scaleX(-1) translateY(-4px) rotate(-0.5deg);
+  }
+}
+
+/* Bumbling effect for cars driving left */
+@keyframes bumble-left {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(0.5deg);
+  }
+}
