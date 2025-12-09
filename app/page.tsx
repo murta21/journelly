@@ -80,16 +80,29 @@ export default function Page() {
             localStorage.removeItem('guestNotes')
           }
           setUser(session?.user ?? null)
+          
+          // Fetch notes from DB after sign-in
+          const { data } = await supabase.from('notes').select('*').order('created_at');
+          if (data) {
+            const styledNotes = data.map((note) => ({ ...note, ...generateNoteStyles() }));
+            setNotes(styledNotes);
+          }
           setIsLoading(false)
+          
+          // Force a hard refresh to update server components (header)
+          window.location.reload()
+          return
           
         } else if (event === 'SIGNED_OUT') {
           setUser(null)
           setNotes([])
           setIsLoading(false)
+          window.location.reload()
+          return
         }
 
         // 3) make layout re-run server code to switch Login→Logout
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        if (event === 'TOKEN_REFRESHED') {
           router.refresh()
         }
       }
