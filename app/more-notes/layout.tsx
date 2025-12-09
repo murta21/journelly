@@ -15,7 +15,7 @@ export default function MoreNotesLayout({
         aria-hidden
         className="fixed inset-0 z-[1] pointer-events-none
                    bg-[url('/notesbg3.avif')] bg-cover bg-center bg-no-repeat
-                   animate-slide-in-right"
+                   animate-slide-in-right dark:brightness-50"
       />
       {/* Car driving along the road at the bottom */}
       <CarAnimation />

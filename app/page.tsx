@@ -80,10 +80,12 @@ export default function Page() {
             localStorage.removeItem('guestNotes')
           }
           setUser(session?.user ?? null)
+          setIsLoading(false)
           
         } else if (event === 'SIGNED_OUT') {
           setUser(null)
           setNotes([])
+          setIsLoading(false)
         }
 
         // 3) make layout re-run server code to switch Login→Logout
