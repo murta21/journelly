@@ -21,8 +21,8 @@ export default function LoginPage() {
         })
 
         if (event === 'SIGNED_IN') {
-          router.refresh()
-          router.push('/')
+          // Use hard navigation to ensure server components refresh
+          window.location.href = '/'
         } else if (event === 'SIGNED_OUT') {
           router.refresh()
         }
