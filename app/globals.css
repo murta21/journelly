@@ -252,6 +252,11 @@
   will-change: left, right, transform;
 }
 
+/* Darken cars in nighttime mode */
+:root.dark .car {
+  filter: brightness(0.5);
+}
+
 /* Two lanes/tracks for cars */
 .car.lane-0 {
   bottom: -58px; /* Bottom lane (closer to road) */
