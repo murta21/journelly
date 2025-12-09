@@ -263,33 +263,57 @@
   z-index: 1; /* In front of lane 0 cars */
 }
 
-/* Car 1 - Orange sedan driving right */
+/* Car 1 - Orange sedan */
 .car.car1 {
-  left: -500px;
   width: 412px;
   height: 222px;
   background-image: url('/car.png');
-  transform: scaleX(-1);
-  animation: drive-right 25s linear infinite, bumble-right 0.3s ease-in-out infinite;
 }
 
-/* Car 2 - Red SUV driving left */
+/* Car 2 - Red SUV */
 .car.car2 {
-  right: -500px;
   width: 380px;
   height: 200px;
+  margin-bottom: 15px; /* Raise SUV a little */
   background-image: url('/car2.png');
-  animation: drive-left 35s linear 3s infinite, bumble-left 0.35s ease-in-out infinite;
 }
 
-/* Car 3 - Yellow muscle car driving left */
+/* Car 3 - Yellow muscle car */
 .car.car3 {
-  right: -500px;
   width: 480px;
   height: 240px;
-  bottom: -15px; /* Lower than default lane-1 */
+  margin-bottom: -14px; /* Lower muscle car a little */
   background-image: url('/car3.png');
-  animation: drive-left 28s linear 18s infinite, bumble-left 0.25s ease-in-out infinite;
+}
+
+/* Direction classes - driving right (left to right) */
+.car.dir-right {
+  left: -500px;
+  right: auto;
+  transform: scaleX(-1);
+  animation: drive-right 25s linear forwards, bumble-right 0.3s ease-in-out infinite;
+}
+
+/* Direction classes - driving left (right to left) */
+.car.dir-left {
+  right: -500px;
+  left: auto;
+  transform: scaleX(1);
+  animation: drive-left 25s linear forwards, bumble-left 0.3s ease-in-out infinite;
+}
+
+/* Stagger car2 and car3 start times */
+.car.car2.dir-left {
+  animation: drive-left 30s linear 3s forwards, bumble-left 0.35s ease-in-out infinite;
+}
+.car.car2.dir-right {
+  animation: drive-right 30s linear 3s forwards, bumble-right 0.35s ease-in-out infinite;
+}
+.car.car3.dir-left {
+  animation: drive-left 28s linear 10s forwards, bumble-left 0.25s ease-in-out infinite;
+}
+.car.car3.dir-right {
+  animation: drive-right 28s linear 10s forwards, bumble-right 0.25s ease-in-out infinite;
 }
 
 /* Keyframe animation for driving right (left to right) */
@@ -318,16 +342,16 @@
     transform: scaleX(-1) translateY(0px) rotate(0deg);
   }
   50% {
-    transform: scaleX(-1) translateY(-4px) rotate(-0.5deg);
+    transform: scaleX(-1) translateY(-4px) rotate(0.5deg);
   }
 }
 
 /* Bumbling effect for cars driving left */
 @keyframes bumble-left {
   0%, 100% {
-    transform: translateY(0px) rotate(0deg);
+    transform: scaleX(1) translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-4px) rotate(0.5deg);
+    transform: scaleX(1) translateY(-4px) rotate(-0.5deg);
   }
 }
