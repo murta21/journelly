@@ -36,37 +36,42 @@ export default function MoreNotesPage() {
     return () => observer.disconnect();
   }, []);
 
+  // Single effect to handle auth state - matches home page pattern
   useEffect(() => {
-    const checkUserAndFetchNotes = async () => {
+    let mounted = true;
+
+    const initialize = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
 
+        if (!mounted) return;
+
         if (!user) {
-          // User is not logged in: stop loading notes and, after the
-          // background transition finishes, show the login overlay.
           setIsLoading(false);
           setTimeout(() => {
-            setShowLoginOverlay(true);
+            if (mounted) setShowLoginOverlay(true);
           }, 600);
         } else {
           const response = await fetch('/api/notes', { credentials: 'include' });
-          if (response.ok) {
+          if (response.ok && mounted) {
             const data: Note[] = await response.json();
             setNotes(data);
           }
-          setIsLoading(false);
+          if (mounted) setIsLoading(false);
         }
       } catch (error) {
         console.error('Error checking user or fetching notes', error);
-        setIsLoading(false);
+        if (mounted) setIsLoading(false);
       }
     };
-    checkUserAndFetchNotes();
-  }, [supabase]);
 
-  useEffect(() => {
+    initialize();
+
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!mounted) return;
+
         await fetch('/auth/callback', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -75,22 +80,22 @@ export default function MoreNotesPage() {
         });
 
         if (event === 'SIGNED_IN') {
-          // Use hard navigation to ensure cookies are synced before fetching notes
-          window.location.reload();
-          return;
+          // Navigate to home page after successful login
+          router.push('/');
         } else if (event === 'SIGNED_OUT') {
-          setNotes([]);
-          setIsLoading(false);
-        }
-
-        if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-          router.refresh();
+          if (mounted) {
+            setNotes([]);
+            setIsLoading(false);
+          }
         }
       }
     );
 
-    return () => subscription.unsubscribe();
-  }, [supabase, router]);
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
 
   if (isLoading) {
     return (
@@ -141,9 +146,9 @@ export default function MoreNotesPage() {
             style={{ backgroundColor: isDark ? '#4c2048' : '#5C2E0A' }}
           >
             <div className="flex justify-end mb-4">
-              <button
-                onClick={() => router.push('/')}
-                className="hover:text-white"
+              <a
+                href="/"
+                className="hover:text-white cursor-pointer"
                 style={{ color: isDark ? '#bfdbfe' : '#FFD699' }}
                 aria-label="Close"
               >
@@ -162,7 +167,7 @@ export default function MoreNotesPage() {
                     d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
-              </button>
+              </a>
             </div>
 
             <h1 

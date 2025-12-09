@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState, FormEvent, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, FormEvent } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
@@ -28,101 +27,69 @@ export default function Page() {
   const [flippedNoteId, setFlippedNoteId] = useState<number | string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
-  // Memoize supabase client so it doesn't change between renders
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = createClient();
 
   const charLimit = 290;
   const frontCharLimit = 160;
   const guestNoteLimit = 3;
 
-  // This effect runs once to check the user's auth state
+  // Simple auth effect
   useEffect(() => {
-    const checkUser = async () => {
+    let ignore = false;
+
+    async function loadData() {
       try {
-        const { data } = await supabase.auth.getUser();
-        setUser(data.user);
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        
+        if (ignore) return;
+
+        if (currentUser) {
+          setUser(currentUser);
+          fetchNotesFromDB();
+        } else {
+          fetchNotesFromLocal();
+        }
       } catch (error) {
-        console.error('Error checking user:', error);
+        console.error('Error loading data:', error);
+        fetchNotesFromLocal();
       } finally {
-        setIsLoading(false);
+        if (!ignore) setIsLoading(false);
       }
+    }
+
+    loadData();
+
+    return () => {
+      ignore = true;
     };
-    checkUser();
   }, [supabase]);
 
-  // This effect runs when the user state changes (e.g., after login)
-  useEffect(() => {
-    if (user) {
-      // User is logged in, fetch from DB
-      fetchNotesFromDB();
-    } else if (!isLoading) {
-      // User is a guest, fetch from localStorage
-      fetchNotesFromLocal();
-    }
-  }, [user, isLoading]);
-
-  // Handle login event to save local notes
+  // Handle auth state changes
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // 1) tell server to set/clear cookies
-        await fetch('/auth/callback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ event, session }),
-          credentials: 'include',
-        });
-
-        // 2) your current migration logic on sign-in
-        if (event === 'SIGNED_IN') {
-          const localNotes = JSON.parse(localStorage.getItem('guestNotes') || '[]')
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Migrate guest notes
+          const localNotes = JSON.parse(localStorage.getItem('guestNotes') || '[]');
           if (localNotes.length > 0) {
             await fetch('/api/notes/batch-insert', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ notes: localNotes }),
-            })
-            localStorage.removeItem('guestNotes')
+            });
+            localStorage.removeItem('guestNotes');
           }
-          setUser(session?.user ?? null)
           
-          // Fetch notes from DB after sign-in
-          const { data } = await supabase.from('notes').select('*').order('created_at');
-          if (data) {
-            const styledNotes = data.map((note) => ({ ...note, ...generateNoteStyles() }));
-            setNotes(styledNotes);
-          }
-          setIsLoading(false)
-          
+          setUser(session.user);
+          fetchNotesFromDB();
         } else if (event === 'SIGNED_OUT') {
-          setUser(null)
-          setNotes([])
-          setIsLoading(false)
-        }
-
-        // 3) make layout re-run server code to switch Login→Logout
-        // Only refresh on actual sign in/out, not token refreshes (which happen silently)
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-          router.refresh()
+          setUser(null);
+          setNotes([]);
         }
       }
-    )
-    return () => subscription.unsubscribe()
-  }, [supabase, router])
-
-// Sync session cookies on mount (no refresh needed - checkUser handles the state)
-useEffect(() => {
-  (async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    await fetch('/auth/callback', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event: 'INITIAL_SESSION', session }),
-      credentials: 'include',
-    })
-  })()
-}, [supabase])
+    );
+    return () => subscription.unsubscribe();
+  }, [supabase]);
 
 
   // --- Data Fetching Logic ---

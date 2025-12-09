@@ -13,18 +13,16 @@ export default function LoginPage() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        await fetch('/auth/callback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ event, session }),
-          credentials: 'include',
-        })
-
         if (event === 'SIGNED_IN') {
-          // Use hard navigation to ensure server components refresh
-          window.location.href = '/'
-        } else if (event === 'SIGNED_OUT') {
-          router.refresh()
+          // Sync cookies then redirect
+          await fetch('/auth/callback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ event, session }),
+            credentials: 'include',
+          })
+          // Simple navigation - let home page handle state
+          router.push('/')
         }
       }
     )
