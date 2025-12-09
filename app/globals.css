@@ -259,12 +259,12 @@
 
 /* Two lanes/tracks for cars */
 .car.lane-0 {
-  bottom: -58px; /* Bottom lane (closer to road) */
+  bottom: 0px; /* Bottom lane (closer to road) */
   z-index: 2; /* Behind lane 1 cars */
 }
 
 .car.lane-1 {
-  bottom: 10px; /* Top lane */
+  bottom: 50px; /* Top lane */
   z-index: 1; /* In front of lane 0 cars */
 }
 
@@ -279,7 +279,7 @@
 .car.car2 {
   width: 380px;
   height: 200px;
-  margin-bottom: 15px; /* Raise SUV a little */
+  margin-bottom: 10px; /* Raise SUV a little */
   background-image: url('/car2.png');
 }
 

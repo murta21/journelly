@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, FormEvent } from 'react';
+import { useEffect, useState, FormEvent, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
@@ -29,7 +29,8 @@ export default function Page() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const supabase = createClient();
+  // Memoize supabase client so it doesn't change between renders
+  const supabase = useMemo(() => createClient(), []);
 
   const charLimit = 290;
   const frontCharLimit = 160;
@@ -38,9 +39,14 @@ export default function Page() {
   // This effect runs once to check the user's auth state
   useEffect(() => {
     const checkUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user);
-      setIsLoading(false);
+      try {
+        const { data } = await supabase.auth.getUser();
+        setUser(data.user);
+      } catch (error) {
+        console.error('Error checking user:', error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     checkUser();
   }, [supabase]);
@@ -96,7 +102,8 @@ export default function Page() {
         }
 
         // 3) make layout re-run server code to switch Login→Logout
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        // Only refresh on actual sign in/out, not token refreshes (which happen silently)
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
           router.refresh()
         }
       }
@@ -104,6 +111,7 @@ export default function Page() {
     return () => subscription.unsubscribe()
   }, [supabase, router])
 
+// Sync session cookies on mount (no refresh needed - checkUser handles the state)
 useEffect(() => {
   (async () => {
     const { data: { session } } = await supabase.auth.getSession()
@@ -113,8 +121,6 @@ useEffect(() => {
       body: JSON.stringify({ event: 'INITIAL_SESSION', session }),
       credentials: 'include',
     })
-    // optional: 
-    router.refresh()
   })()
 }, [supabase])
 

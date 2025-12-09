@@ -4,10 +4,10 @@ import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
 export default function LoginPage() {
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const router = useRouter()
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function LoginPage() {
         theme="auto"
         appearance={{
           theme: ThemeSupa,
-          className: { container: 'supabase-auth',                // was: className: 'supabase-auth'
+          className: { container: 'supabase-auth',
             input: 'bg-[#0b1220] text-white border-slate-600',
             anchor: 'text-gray-400 hover:text-gray-200',
             button: 'bg-emerald-500 hover:bg-emerald-600',
@@ -61,7 +61,7 @@ export default function LoginPage() {
               colors: {
                 brand: '#10b981',
                 brandAccent: '#059669',
-                inputBackground: '#0b1220', // near-black
+                inputBackground: '#0b1220',
                 inputText: '#ffffff',
                 inputBorder: '#4c5056ff',
               },
@@ -73,7 +73,7 @@ export default function LoginPage() {
                 inputBackground: '#ffffff',
                 inputText: '#0f172a',
                 inputBorder: '#d1d5db',
-                defaultButtonBackground: '#292929ff',       // ← light gray
+                defaultButtonBackground: '#292929ff',
                 defaultButtonBackgroundHover: '#313131ff',
                 defaultButtonBorder: '#3f6cab',
                 defaultButtonText: '#ffffffff',

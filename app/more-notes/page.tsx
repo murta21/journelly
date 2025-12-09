@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Auth } from '@supabase/auth-ui-react';
@@ -20,7 +20,7 @@ export default function MoreNotesPage() {
   const [showLoginOverlay, setShowLoginOverlay] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Track dark mode changes
   useEffect(() => {
@@ -75,22 +75,15 @@ export default function MoreNotesPage() {
         });
 
         if (event === 'SIGNED_IN') {
-          setShowLoginOverlay(false);
-          try {
-            const response = await fetch('/api/notes', { credentials: 'include' });
-            if (response.ok) {
-              const data: Note[] = await response.json();
-              setNotes(data);
-            }
-          } finally {
-            setIsLoading(false);
-          }
+          // Use hard navigation to ensure cookies are synced before fetching notes
+          window.location.reload();
+          return;
         } else if (event === 'SIGNED_OUT') {
           setNotes([]);
           setIsLoading(false);
         }
 
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
           router.refresh();
         }
       }
