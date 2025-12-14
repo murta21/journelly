@@ -65,12 +65,21 @@ export default function MoreNotesPage() {
 
     loadData();
 
-    // Listen for auth changes - only handle sign out
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event) => {
         if (ignore) return;
 
-        if (event === 'SIGNED_OUT') {
+        if (event === 'SIGNED_IN') {
+          // Close overlay and fetch notes
+          setShowLoginOverlay(false);
+          const response = await fetch('/api/notes', { credentials: 'include' });
+          if (response.ok && !ignore) {
+            const data: Note[] = await response.json();
+            setNotes(data);
+          }
+          setIsLoading(false);
+        } else if (event === 'SIGNED_OUT') {
           setNotes([]);
           setShowLoginOverlay(true);
         }
