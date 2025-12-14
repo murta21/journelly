@@ -3,7 +3,6 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
@@ -19,7 +18,6 @@ export default function MoreNotesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showLoginOverlay, setShowLoginOverlay] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
   // Track dark mode changes
@@ -36,63 +34,51 @@ export default function MoreNotesPage() {
     return () => observer.disconnect();
   }, []);
 
-  // Single effect to handle auth state - matches home page pattern
+  // Simple auth effect - stay on More Notes even when logged in
   useEffect(() => {
-    let mounted = true;
+    let ignore = false;
 
-    const initialize = async () => {
+    async function loadData() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
 
-        if (!mounted) return;
+        if (ignore) return;
 
         if (!user) {
           setIsLoading(false);
           setTimeout(() => {
-            if (mounted) setShowLoginOverlay(true);
+            if (!ignore) setShowLoginOverlay(true);
           }, 600);
         } else {
           const response = await fetch('/api/notes', { credentials: 'include' });
-          if (response.ok && mounted) {
+          if (response.ok && !ignore) {
             const data: Note[] = await response.json();
             setNotes(data);
           }
-          if (mounted) setIsLoading(false);
+          if (!ignore) setIsLoading(false);
         }
       } catch (error) {
         console.error('Error checking user or fetching notes', error);
-        if (mounted) setIsLoading(false);
+        if (!ignore) setIsLoading(false);
       }
-    };
+    }
 
-    initialize();
+    loadData();
 
-    // Listen for auth changes
+    // Listen for auth changes - only handle sign out
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted) return;
+      async (event) => {
+        if (ignore) return;
 
-        await fetch('/auth/callback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ event, session }),
-          credentials: 'include',
-        });
-
-        if (event === 'SIGNED_IN') {
-          // Navigate to home page after successful login
-          router.push('/');
-        } else if (event === 'SIGNED_OUT') {
-          if (mounted) {
-            setNotes([]);
-            setIsLoading(false);
-          }
+        if (event === 'SIGNED_OUT') {
+          setNotes([]);
+          setShowLoginOverlay(true);
         }
       }
     );
 
     return () => {
-      mounted = false;
+      ignore = true;
       subscription.unsubscribe();
     };
   }, [supabase]);
